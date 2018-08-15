@@ -1,0 +1,121 @@
+@startuml
+partition local {
+(*) --> "Read parameters"
+if "Set parameters?" then
+    --> [no] "Output error messages" as err
+    note bottom
+        * <&terminal> Stderr
+        * <&envelope-closed> AWS SNS
+    end note
+    --> (*)
+else
+    --> [yes] "Reading setup script <&file> and build script <&file>"
+    if "Reading error?" then
+        --> [yes] err
+    else
+        --> [no] "Generate setup script <&file> and build script <&file>"
+        if "Generate error?" then
+            --> [yes] err
+       else
+}
+
+partition "AWS EC2 <&cloud>" {
+            --> [no] ===B1===
+            --> "Create VPC"
+            if "Create VPC error?" then
+                --> [no] "Create Subnet"
+                --> ===B2===
+            else 
+                --> [yes] ===B2===
+            endif
+
+            ===B1=== --> "Create internet gateway"
+            --> ===B2===
+            if "Any errors?" then
+               --> [no] "Attatch internet gateway"
+              if "Attatch error?" then
+                  --> [yes] err
+             else
+                  --> [no] "Create route table"
+                 if "Create route table error?" then
+                     --> [no] "Associate route table"
+                    if "Associate route table error?" then
+                        --> [no] "Create security group"
+                        if "Create security group error?" then
+                            --> [yes] err
+                        else
+                            --> [no] "Create ec2 instances"
+                            if "Create ec2 instances error?" then
+                                --> [yes] err
+                           else
+                                --> [no] ===B3=== 
+                                --> "Wait until instance running" 
+                                --> ===B4===
+                                ===B3=== --> "Upload the build script to S3 <&cloud-upload>"
+                                --> ===B4===
+                                if "Any errors?" then
+                                    --> [yes] err
+                               else
+                                    --> [no] ===B5===
+                                    --> "Get host's public ip and its instance id"
+                                    --> ===B6===
+                                    ===B5=== --> if "Is topic name exist?" then
+                                        --> [no] "Create new topic"
+                                        if "Create new topic error?" then
+                                            --> [yes] err
+                                        else
+                                            --> [no] ===B6===
+                                        endif
+                                    else
+                                       --> [yes] ===B6===
+                                    endif
+                                    ===B6=== --> "Wait until instance status ok"
+                                    --> "Connect distcc host by ssh" as st1
+                                    if "Connect error?" then
+                                        --> [yes] "Cleaning" as cleanerr
+                                        --> err
+                                    else
+                                        --> [no] "curl -s localhost" as curl
+                                        if "Is status Compiling?" then
+                                            --> [no] Sleep few second
+                                            --> curl
+                                        else
+                                            --> [yes] "Run build script"
+                                            --> "Connect distcc host by ssh" as st2
+                                            if "Connect error?" then
+                                                --> [yes] cleanerr
+                                            else
+                                                --> [no] "curl -s localhost" as curls
+                                                if "Is status BuildSucceed?" then
+                                                    --> [yes] "Output Build success and duration messages"
+                                                    --> "Upload the compiled files to S3 <&cloud-upload>"
+                                                    --> "Cleaning" as clean
+                                                    --> (*)
+                                                else 
+                                                    if "Is status BuildFailed?" then
+                                                        --> [yes] "Output Build failed messages"
+                                                        --> clean
+                                                    else
+                                                        --> curls
+                                                    endif
+                                                endif
+                                        endif
+                                    endif
+                               endif
+                            endif
+                        endif 
+                    else
+                        --> [yes] err
+                    endif
+                 else
+                     --> [yes] err
+                 endif
+             endif
+           else 
+               --> [yes] err
+           endif
+ }               
+        endif
+    endif   
+endif
+@enduml
