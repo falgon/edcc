@@ -29,16 +29,12 @@ main() {
     Res=$?
 
     if [ ${Res} -eq 0 ]; then
-	    write_status\
-	       	"`curl -s http://169.254.169.254/latest/meta-data/instance-id`"\
-		    "BuildSuccess"
+        {{.write_success}}
 	    cd ../
 	    aws s3 cp ${WORKDIR} s3://${BUCKETNAME}/buildout/ --recursive --region ${REGION}
 	    exit 0
     else
-	    write_status\
-	       	"`curl -s http://169.254.169.254/latest/meta-data/instance-id`"\
-		    "BuildFailed"
+        {{.write_failed}}
 	    exit ${Res}
     fi
 }
