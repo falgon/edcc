@@ -47,7 +47,7 @@ partition "AWS EC2 <&cloud>" {
                             --> [no] "Create ec2 instances"
                             if "Create ec2 instances error?" then
                                 --> [yes] err
-                           else
+                            else
                                 --> [no] ===B3=== 
                                 --> "Wait until instance running" 
                                 --> ===B4===
@@ -61,59 +61,63 @@ partition "AWS EC2 <&cloud>" {
                                     --> ===B6===
                                     ===B5=== --> if "Is topic name exist?" then
                                         --> [no] "Create new topic"
-                                        if "Create new topic error?" then
-                                            --> [yes] err
-                                        else
-                                            --> [no] ===B6===
-                                        endif
+                                        --> ===B6===
                                     else
                                        --> [yes] ===B6===
                                     endif
-                                    ===B6=== --> "Wait until instance status ok"
-                                    --> "Connect distcc host by ssh" as st1
-                                    if "Connect error?" then
-                                        --> [yes] "Cleaning" as cleanerr
-                                        --> err
+                                    ===B6=== --> if "Any errors?" then
+                                        --> [yes] err
                                     else
-                                        --> [no] "curl -s localhost" as curl
-                                        if "Is status Compiling?" then
-                                            --> [no] Sleep few second
-                                            --> curl
+                                        --> [no] "Wait until instance status ok"
+                                        --> "Connect distcc host by ssh" as st1
+                                        if "Connect error?" then
+                                            --> [yes] "Cleaning" as cleanerr
+                                            --> err
                                         else
-                                            --> [yes] "Run build script"
-                                            --> "Connect distcc host by ssh" as st2
-                                            if "Connect error?" then
-                                                --> [yes] cleanerr
+                                            --> [no] "curl -s localhost" as curl
+                                            if "Is status Compiling?" then
+                                                --> [no] Sleep few second
+                                                --> curl
                                             else
-                                                --> [no] "curl -s localhost" as curls
-                                                if "Is status BuildSucceed?" then
-                                                    --> [yes] "Output Build success and duration messages"
-                                                    --> "Upload the compiled files to S3 <&cloud-upload>"
-                                                    --> "Cleaning" as clean
-                                                    --> (*)
-                                                else 
-                                                    if "Is status BuildFailed?" then
-                                                        --> [yes] "Output Build failed messages"
-                                                        --> clean
+                                                --> [yes] "Run build script"
+                                                if "Build script failed?" then
+                                                    --> [yes] cleanerr
+                                                else
+                                                    --> "Connect distcc host by ssh" as st2
+                                                    if "Connect error?" then
+                                                        --> [yes] cleanerr
                                                     else
-                                                        --> curls
+                                                        --> [no] "curl -s localhost" as curls
+                                                        if "Is status BuildSucceed?" then
+                                                            --> [yes] "Output Build success and duration messages"
+                                                            --> "Upload the compiled files to S3 <&cloud-upload>"
+                                                            --> "Cleaning" as clean
+                                                            --> (*)
+                                                        else 
+                                                            [no] if "Is status BuildFailed?" then
+                                                                --> [yes] "Output Build failed messages"
+                                                                --> clean
+                                                            else
+                                                                --> [no] st2
+                                                            endif
+                                                        endif
                                                     endif
                                                 endif
+                                            endif
                                         endif
                                     endif
-                               endif
-                            endif
-                        endif 
+                                endif
+                            endif 
+                        else
+                            --> [yes] err
+                        endif
                     else
-                        --> [yes] err
+                         --> [yes] err
                     endif
-                 else
-                     --> [yes] err
-                 endif
-             endif
-           else 
-               --> [yes] err
-           endif
+                endif
+            else 
+                --> [yes] err
+            endif
  }               
         endif
     endif   
