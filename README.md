@@ -1,7 +1,9 @@
 # edcc
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a0b1ec0a83de455eaa82cdd14942bcc9)](https://app.codacy.com/app/falgon/edcc?utm_source=github.com&utm_medium=referral&utm_content=falgon/edcc&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://travis-ci.org/falgon/edcc.svg?branch=master)](https://travis-ci.org/falgon/edcc)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a0b1ec0a83de455eaa82cdd14942bcc9)](https://app.codacy.com/app/falgon/edcc?utm_source=github.com&utm_medium=referral&utm_content=falgon/edcc&utm_campaign=Badge_Grade_Dashboard)
+[![Maintainability](https://api.codeclimate.com/v1/badges/b0fdd267bbf0c7a65456/maintainability)](https://codeclimate.com/github/falgon/edcc/maintainability)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 Simple and tiny comprehensive management tool for 
 distributed compilation using [distcc](https://github.com/distcc) on AWS EC2.

@@ -1,0 +1,26 @@
+version: 1.0.0.{build}
+platform: x64
+branches:
+    only:
+        - master
+clone_folger: c:\gopath\src\github.com\falgon\edcc
+environment:
+    GOPATH: c:\gopath
+    DEPTESTBYPASS501: 1
+    GOVERSION: 1.9
+init:
+    - git config --global core.autocrlf input
+install:
+    - rmdir c:\go /s /q
+    - ps: Test-NetConnection google.com -Port 80
+    - appveyor DownloadFile https://storage.googleapis.com/golang/go%GOVERSION%.windows-amd64.msi
+    - msiexec /i go%GOVERSION%.windows-amd64.msi /q
+    - set Path=c:\go\bin;c:\gopath\bin;C:\Program Files (x86)\Bazaar\;C:\Program Files\Mercurial\%Path%
+    - go version
+    - go env
+    - go get -u golang.org/x/sync/errgroup github.com/aws/aws-sdk-go/aws github.com/aws/aws-sdk-go/aws/session github.com/aws/aws-sdk-go/service/s3 github.com/aws/aws-sdk-go/service/s3/s3manager github.com/aws/aws-sdk-go/service/sns golang.org/x/sync/errgroup golang.org/x/crypto/ssh github.com/fatih/color
+
+build_script:
+    - go build github.com/golang/edcc/src
+      
+test: off
