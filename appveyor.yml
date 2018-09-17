@@ -3,7 +3,7 @@ platform: x64
 branches:
     only:
         - master
-clone_folger: c:\gopath\src\github.com\falgon\edcc
+clone_folder: c:\gopath\src\github.com\falgon\edcc
 environment:
     GOPATH: c:\gopath
     DEPTESTBYPASS501: 1
