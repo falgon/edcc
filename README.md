@@ -1,5 +1,6 @@
 # edcc
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a0b1ec0a83de455eaa82cdd14942bcc9)](https://app.codacy.com/app/falgon/edcc?utm_source=github.com&utm_medium=referral&utm_content=falgon/edcc&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://travis-ci.org/falgon/edcc.svg?branch=master)](https://travis-ci.org/falgon/edcc)
 
 Simple and tiny comprehensive management tool for 
